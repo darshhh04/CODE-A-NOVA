@@ -1,6 +1,5 @@
 # Python cache
 __pycache__/
-__pycache__
 *.pyc
 
 # Python virtual environment
@@ -9,6 +8,7 @@ venv/
 
 # Environment files
 .env
+env
 
 # Frontend
 node_modules/

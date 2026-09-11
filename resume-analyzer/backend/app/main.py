@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.routers import upload
+from app.routers import upload, match, feedback
 
 app = FastAPI(title="AI Resume Analyzer API")
 
@@ -14,6 +14,8 @@ app.add_middleware(
 )
 
 app.include_router(upload.router, prefix="/api", tags=["upload"])
+app.include_router(match.router, prefix="/api", tags=["match"])
+app.include_router(feedback.router, prefix="/api", tags=["feedback"])
 
 
 @app.get("/")
