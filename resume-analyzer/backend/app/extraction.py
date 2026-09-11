@@ -4,7 +4,7 @@ import pdfplumber
 from docx import Document
 
 
-def extract_text_from_pdf(file_bytes: bytes) -> str:
+def extract_text_from_pdf(file_bytes: bytes):
 
     text_chunks = []
     with pdfplumber.open(io.BytesIO(file_bytes)) as pdf:
@@ -15,14 +15,14 @@ def extract_text_from_pdf(file_bytes: bytes) -> str:
     return "\n".join(text_chunks)
 
 
-def extract_text_from_docx(file_bytes: bytes) -> str:
+def extract_text_from_docx(file_bytes: bytes):
 
     document = Document(io.BytesIO(file_bytes))
     paragraphs = [p.text for p in document.paragraphs if p.text.strip()]
     return "\n".join(paragraphs)
 
 
-def extract_text(filename: str, file_bytes: bytes) -> str:
+def extract_text(filename, file_bytes: bytes):
 
     lower_name = filename.lower()
     if lower_name.endswith(".pdf"):
