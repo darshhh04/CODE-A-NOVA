@@ -1,63 +1,96 @@
 import { useState } from "react";
+import { uploadResume, getFeedback } from "./api";
+
+import FileUpload from "./components/FileUpload";
+import ResultsPanel from "./components/ResultsPanel";
+import "./App.css";
 
 
-const API_URL = "http://localhost:8000/api/upload";
+const STATUS = {
+  IDLE: "idle",
+  UPLOADING: "uploading",
+  READY: "ready",
+  ANALYZING: "analyzing",
+  DONE: "done",
+  ERROR: "error",
+};
 
 function App() {
-  const [file, setFile] = useState(null);
+  const [status, setStatus] = useState(STATUS.IDLE);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [resumeText, setResumeText] = useState(null);
+  const [jdText, setJdText] = useState("");
   const [result, setResult] = useState(null);
-  const [error, setError] = useState(null);
+  const [errorMessage, setErrorMessage] = useState(null);
 
-  async function handleUpload() {
+  async function handleFileSelected(file) {
+    setSelectedFile(file);
+    setResult(null);
     if (!file) return;
 
-    const formData = new FormData();
-    formData.append("file", file);
-
-    setError(null);
-    setResult(null);
-
+    setStatus(STATUS.UPLOADING);
+    setErrorMessage(null);
     try {
-      const response = await fetch(API_URL, {
-        method: "POST",
-        body: formData,
-      });
-
-      if (!response.ok) {
-        const body = await response.json();
-        throw new Error(body.detail || "Upload failed");
-      }
-
-      const data = await response.json();
-      setResult(data);
+      const data = await uploadResume(file);
+      setResumeText(data.raw_text);
+      setStatus(STATUS.READY);
     } catch (err) {
-      setError(err.message);
+      setErrorMessage(err.message);
+      setStatus(STATUS.ERROR);
     }
   }
 
+  async function handleAnalyze() {
+    setStatus(STATUS.ANALYZING);
+    setErrorMessage(null);
+    try {
+      const data = await getFeedback(resumeText, jdText);
+      setResult(data);
+      setStatus(STATUS.DONE);
+    } catch (err) {
+      setErrorMessage(err.message);
+      setStatus(STATUS.ERROR);
+    }
+  }
+
+  const canAnalyze =
+    resumeText && jdText.trim().length > 0 &&
+    status !== STATUS.UPLOADING && status !== STATUS.ANALYZING;
+
   return (
-    <div style={{ padding: "2rem", fontFamily: "sans-serif" }}>
+    <div className="app-container">
       <h1>AI Resume Analyzer</h1>
 
-      <input
-        type="file"
-        accept=".pdf,.docx"
-        onChange={(e) => setFile(e.target.files[0])}
+      <FileUpload
+        onFileSelected={handleFileSelected}
+        selectedFileName={selectedFile?.name}
+        disabled={status === STATUS.UPLOADING || status === STATUS.ANALYZING}
       />
-      <button onClick={handleUpload} disabled={!file}>
-        Upload & Extract Text
+      {status === STATUS.UPLOADING && <p className="loading-text">Extracting text from resume…</p>}
+
+      <label htmlFor="jd-textarea">Job Description</label>
+      <textarea
+        id="jd-textarea"
+        value={jdText}
+        onChange={(e) => setJdText(e.target.value)}
+        placeholder="Paste the job description here…"
+        rows={8}
+        disabled={status === STATUS.ANALYZING}
+      />
+
+      <button onClick={handleAnalyze} disabled={!canAnalyze}>
+        {status === STATUS.ANALYZING ? "Analyzing…" : "Analyze Match"}
       </button>
 
-      {error && <p style={{ color: "red" }}>Error: {error}</p>}
+      {status === STATUS.ERROR && errorMessage && <p className="error-text">Error: {errorMessage}</p>}
 
-      {result && (
-        <div>
-          <p>
-            <strong>{result.filename}</strong> — {result.char_count} characters
-          </p>
-          <pre style={{ whiteSpace: "pre-wrap", background: "#f4f4f4", padding: "1rem" }}>
-            {result.text}
-          </pre>
+      {status === STATUS.DONE && result && (
+        <div className="results-section">
+          <ResultsPanel
+            missingKeywords={result.missing_keywords}
+            suggestions={result.suggestions}
+            feedbackSource={result.feedback_source}
+          />
         </div>
       )}
     </div>
