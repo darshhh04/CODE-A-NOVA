@@ -21,7 +21,7 @@ An AI-powered resume analyzer that compares a resume with a job description and 
 
 ### 🌐 Live Demo
 
-**Live Application:** [demo_name](YOUR_LIVE_DEMO_LINK)
+**Live Application:** [ai-resume-analyzer-darshan.netlify.app/](https://ai-resume-analyzer-darshan.netlify.app/)
 
 
 
