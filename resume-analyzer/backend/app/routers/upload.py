@@ -2,6 +2,7 @@ from fastapi import APIRouter, UploadFile, File, HTTPException
 
 from app.extraction import extract_text
 from app.cleaning import full_clean_resume
+from app.ats_score import check_ats_compatibility
 
 router = APIRouter()
 
@@ -19,9 +20,14 @@ async def upload_resume(file: UploadFile = File(...)):
 
     cleaned_text = full_clean_resume(raw_text)
 
+    ats_result = check_ats_compatibility(raw_text)
+
     return {
         "filename": file.filename,
         "char_count": len(raw_text),
         "raw_text": raw_text,
         "cleaned_text": cleaned_text,
+
+        "ats_score": ats_result["ats_score"],
+        "ats_issues": ats_result["issues"],
     }
