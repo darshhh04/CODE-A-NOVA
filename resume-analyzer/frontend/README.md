@@ -27,7 +27,7 @@ An AI-powered resume analyzer that compares a resume with a job description and 
 
 ### 📸 Screenshot
 
-![AI Resume Analyzer](docs/heropage_2.png)
+![AI Resume Analyzer](resume-analyzer/backend/docs/heropage_2.png)
 
 
 ---

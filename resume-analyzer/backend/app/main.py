@@ -8,7 +8,7 @@ app = FastAPI(title="AI Resume Analyzer API")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://ai-resume-analyzer-darshan.netlify.app/"],
+    allow_origins=["https://ai-resume-analyzer-darshan.netlify.app"],
     allow_methods=["*"],
     allow_headers=["*"],
 )
