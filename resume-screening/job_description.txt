@@ -1,0 +1,5 @@
+Python Developer
+
+We are looking for a Python Developer with experience in Python, SQL and Git.
+The candidate should know machine learning basics, pandas and numpy.
+Knowledge of flask or fastapi, REST API and docker is a plus.
